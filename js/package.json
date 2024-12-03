@@ -1,0 +1,11 @@
+{
+  "name": "advent-of-code-2024",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "LuMizera",
+  "license": "ISC",
+  "description": "My implementation of Advent of Code 2024 made in JS",
+  "scripts": {
+    "start": "node index.js"
+  }
+}
