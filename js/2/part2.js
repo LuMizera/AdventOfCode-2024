@@ -13,13 +13,24 @@ function isReportSafe(report) {
   return isIncreasing || isDecreasing;
 }
 
-function countSafeReports(reports) {
-  return reports.filter((report) => isReportSafe(report)).length;
+function countSafeReports(reports, allowProblemDampener = false) {
+  return reports.filter((report) => {
+    if (isReportSafe(report)) return true;
+
+    if (allowProblemDampener) {
+      return report.some((_, removeIdx) => {
+        const modifiedReport = report.filter((_, idx) => idx !== removeIdx);
+        return isReportSafe(modifiedReport);
+      });
+    }
+
+    return false;
+  }).length;
 }
 
 fs.readFile(path.dirname(__filename) + '/input.txt', 'utf8').then((plainInputData) => {
   const numberArray = plainInputData.split('\n').map((line) => line.split(' ').map(Number));
 
-  const result = countSafeReports(numberArray);
+  const result = countSafeReports(numberArray, true);
   console.log('🚀 ~ fs.readFile ~ result:', result);
 });
