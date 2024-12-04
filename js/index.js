@@ -25,14 +25,24 @@ getSolvedChallenges().then((challenges) => {
     (input) => {
       const number = parseInt(input, 10);
 
-      if (isNaN(number) && !challenges.includes(number.toString())) {
+      if (isNaN(number) || !challenges.includes(number.toString())) {
         console.log('That is not a valid number.');
+        rl.close();
         return;
       }
 
-      require(`./${number}/index.js`);
-      // Close the readline interface
-      rl.close();
+      rl.question('Enter the part (1 or 2): ', (part) => {
+        const partNumber = parseInt(part, 10);
+
+        if (isNaN(partNumber) || ![1, 2].includes(partNumber)) {
+          console.log('That is not a valid part.');
+          rl.close();
+          return;
+        }
+
+        require(`./${number}/part${partNumber}.js`);
+        rl.close();
+      });
     }
   );
 });
