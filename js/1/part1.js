@@ -1,47 +1,35 @@
 const fs = require('fs/promises');
 const path = require('path');
 
-async function init() {
-  let { list1, list2 } = await getNumbersFromInput();
-
+/**
+ * @param {number[]} leftList
+ * @param {number[]} rightList
+ * @returns {number}
+ */
+async function calculateDistance(leftList, rightList) {
   let result = 0;
 
-  for (let i = 0; i < list1.length; i++) {
-    const lowest1 = list1[i];
-    const lowest2 = list2[i];
-
-    result += Math.max(lowest1, lowest2) - Math.min(lowest1, lowest2);
+  for (let i = 0; i < leftList.length; i++) {
+    result += Math.abs(leftList[i] - rightList[i]);
   }
 
-  // 1579939 = correct
-  console.log('Result: ', result);
+  return result;
 }
 
-/**
- * @returns {Promise<{list1: number[], list2: number[]}>}
- */
-async function getNumbersFromInput() {
-  try {
-    const plainInputData = await fs.readFile(path.dirname(__filename) + '/input.txt', 'utf8');
+fs.readFile(path.dirname(__filename) + '/input.txt', 'utf8').then((plainInputData) => {
+  const listLeft = [];
+  const listRight = [];
 
-    const list1 = [];
-    const list2 = [];
-
-    plainInputData.split('\n').forEach((line) => {
-      line.split('   ').forEach((number, index) => {
-        if (index === 0) {
-          list1.push(Number(number));
-          return;
-        }
-
-        list2.push(Number(number));
-      });
+  plainInputData.split('\n').forEach((line) => {
+    const [valueLeft, valueRight] = line.split('   ').forEach((number, index) => {
+      listLeft.push(Number(valueLeft));
+      listRight.push(Number(valueRight));
     });
+  });
 
-    return { list1: list1.sort((a, b) => a - b), list2: list2.sort((a, b) => a - b) };
-  } catch (error) {
-    console.log('🚀 ~ getNumbersFromInput ~ error:', error);
-  }
-}
+  listLeft.sort((a, b) => a - b);
+  listRight.sort((a, b) => a - b);
 
-init();
+  const distance = calculateDistance(listLeft, listRight);
+  console.log("🚀 ~ fs.readFile ~ distance:", distance)
+});

@@ -1,52 +1,39 @@
 const fs = require('fs/promises');
 const path = require('path');
 
-async function init() {
-  let { hashMap1, hashMap2 } = await getNumbersFromInput();
-
+/**
+ * @param {Map<number, number>} hashMapLeft
+ * @param {Map<number, number>} hashMapRight
+ * @returns {number}
+ */
+async function calculateSimiliarityScore(hashMapLeft, hashMapRight) {
   let result = 0;
 
-  hashMap1.entries().forEach(([key]) => {
-    if (hashMap2.has(key)) {
-      result += key * hashMap2.get(key);
+  hashMapLeft.entries().forEach(([key]) => {
+    if (hashMapRight.has(key)) {
+      result += key * hashMapRight.get(key);
     }
   });
 
-  // 20351745 = correct
-  console.log('Result: ', result);
+  return result;
 }
 
-/**
- * @returns {Promise<{hashMap1: Map, hashMap2: Map}>}
- */
-async function getNumbersFromInput() {
-  try {
-    const plainInputData = await fs.readFile(path.dirname(__filename) + '/input.txt', 'utf8');
+fs.readFile(path.dirname(__filename) + '/input.txt', 'utf8').then((plainInputData) => {
+  const hashMapLeft = new Map();
+  const hashMapRight = new Map();
 
-    const hashMap1 = new Map();
-    const hashMap2 = new Map();
+  plainInputData.split('\n').forEach((line) => {
+    const [valueLeft, valueRight] = line.split('   ');
 
-    plainInputData.split('\n').forEach((line) => {
-      line.split(' ').forEach((number, index) => {
-        if (!number.trim()) {
-          return;
-        }
+    hashMapLeft.has(Number(valueLeft))
+      ? hashMapLeft.set(Number(valueLeft), hashMapLeft.get(Number(valueLeft)) + 1)
+      : hashMapLeft.set(Number(valueLeft), 1);
 
-        if (index === 0) {
-          hashMap1.has(Number(number))
-            ? hashMap1.set(Number(number), hashMap1.get(Number(number)) + 1)
-            : hashMap1.set(Number(number), 1);
-          return;
-        }
-        hashMap2.has(Number(number))
-          ? hashMap2.set(Number(number), hashMap2.get(Number(number)) + 1)
-          : hashMap2.set(Number(number), 1);
-      });
-    });
-    return { hashMap1, hashMap2 };
-  } catch (error) {
-    console.log('🚀 ~ getNumbersFromInput ~ error:', error);
-  }
-}
+    hashMapRight.has(Number(valueRight))
+      ? hashMapRight.set(Number(valueRight), hashMapRight.get(Number(valueRight)) + 1)
+      : hashMapRight.set(Number(valueRight), 1);
+  });
 
-init();
+  const similiatiry = calculateSimiliarityScore(hashMapLeft, hashMapRight);
+  console.log('🚀 ~ fs.readFile ~ similiatiry:', similiatiry);
+});
